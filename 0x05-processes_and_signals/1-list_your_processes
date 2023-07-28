@@ -1,24 +1,4 @@
 #!/usr/bin/env bash
 # Bash script that displays a list of currently running processes.
 
-printf "%-10s %-5s %-5s %-6s %-6s %-5s %-10s %-5s %-5s %s\n" "USER" "PID" "%CPU" "%MEM" "VSZ" "RSS" "TTY" "STAT" "START" "COMMAND"
-
-for process in /proc/*/; do
-    pid=$(basename "$process")
-
-    if ! [[ "$pid" =~ ^[0-9]+$ ]]; then
-        continue
-    fi
-
-    user=$(awk '/^Uid:/ {print $2}' "$process/status")
-    username=$(getent passwd "$user" | awk -F: '{print $1}')
-    cpu=$(awk '{sum+=$1} END {print sum}' "$process/stat" | awk '{print $1 / 100}')
-    mem=$(awk '/VmRSS:/ {print $2}' "$process/status")
-    vsz=$(awk '/VmSize:/ {print $2}' "$process/status")
-    tty=$(awk '/tty/ {print $1}' "$process/stat")
-    stat=$(awk '{print $3}' "$process/stat")
-    start=$(awk '{print $22}' "$process/stat")
-    cmd=$(tr -d '\0' < "$process/cmdline")  # Process command line
-
-    printf "%-10s %-5s %-5s %-6s %-6s %-5s %-10s %-5s %-5s %s\n" "$username" "$pid" "$cpu" "$mem" "$vsz" "$mem" "$tty" "$stat" "$start" "$cmd"
-done
+ps -auxf
